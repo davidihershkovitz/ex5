@@ -41,18 +41,22 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum);
 // Function to read a playlist name
 char* readPlaylistName() {
     printf("Enter playlist's name:\n");
-    char* name = NULL;
+    char* name = malloc(sizeof(char));
+    if (!name) exit(1);
+
     size_t size = 0, capacity = 1;
     char c;
 
-    name = malloc(capacity * sizeof(char));
-    if (!name) exit(1);
-
     while ((c = getchar()) != '\n') {
         if (size + 1 >= capacity) {
-            capacity *= 2; // Double capacity dynamically
-            name = realloc(name, capacity * sizeof(char));
-            if (!name) exit(1);
+            capacity *= 2; // Double the capacity
+            char* temp = realloc(name, capacity * sizeof(char));
+            if (!temp) {
+                free(name); // Avoid memory leak
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            name = temp;
         }
         name[size++] = c;
     }
@@ -63,66 +67,77 @@ char* readPlaylistName() {
 // Function to read a song title
 char* readSongTitle() {
     printf("Title:\n");
-    char* title = NULL;
+    char* title = malloc(sizeof(char));
+    if (!title) exit(1); // Check initial allocation
+
     size_t size = 0, capacity = 1;
     char c;
 
-    title = malloc(capacity * sizeof(char));
-    if (!title) exit(1);
-
     while ((c = getchar()) != '\n') {
         if (size + 1 >= capacity) {
-            capacity *= 2;
-            title = realloc(title, capacity * sizeof(char));
-            if (!title) exit(1);
+            capacity *= 2; // Double capacity dynamically
+            char* temp = realloc(title, capacity * sizeof(char));
+            if (!temp) {
+                free(title); // Avoid memory leak
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            title = temp;
         }
         title[size++] = c;
     }
-    title[size] = '\0';
+    title[size] = '\0'; // Null-terminate the string
     return title;
 }
-
 // Function to read a song's artist
 char* readSongArtist() {
     printf("Artist:\n");
-    char* artist = NULL;
+    char* artist = malloc(sizeof(char));
+    if (!artist) exit(1); // Check initial allocation
+
     size_t size = 0, capacity = 1;
     char c;
 
-    artist = malloc(capacity * sizeof(char));
-    if (!artist) exit(1);
-
     while ((c = getchar()) != '\n') {
         if (size + 1 >= capacity) {
-            capacity *= 2;
-            artist = realloc(artist, capacity * sizeof(char));
-            if (!artist) exit(1);
+            capacity *= 2; // Double capacity dynamically
+            char* temp = realloc(artist, capacity * sizeof(char));
+            if (!temp) {
+                free(artist); // Avoid memory leak
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            artist = temp; // Assign the new memory to artist
         }
         artist[size++] = c;
     }
-    artist[size] = '\0';
+    artist[size] = '\0'; // Null-terminate the string
     return artist;
 }
 
 // Function to read song lyrics
 char* readSongLyrics() {
     printf("Lyrics:\n");
-    char* lyrics = NULL;
+    char* lyrics = malloc(sizeof(char));
+    if (!lyrics) exit(1); // Check initial allocation
+
     size_t size = 0, capacity = 1;
     char c;
 
-    lyrics = malloc(capacity * sizeof(char));
-    if (!lyrics) exit(1);
-
     while ((c = getchar()) != '\n') {
         if (size + 1 >= capacity) {
-            capacity *= 2;
-            lyrics = realloc(lyrics, capacity * sizeof(char));
-            if (!lyrics) exit(1);
+            capacity *= 2; // Double capacity dynamically
+            char* temp = realloc(lyrics, capacity * sizeof(char));
+            if (!temp) {
+                free(lyrics); // Free original memory to prevent leak
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            lyrics = temp; // Assign the new memory to lyrics
         }
         lyrics[size++] = c;
     }
-    lyrics[size] = '\0';
+    lyrics[size] = '\0'; // Null-terminate the string
     return lyrics;
 }
 
@@ -159,8 +174,17 @@ void addSong(Playlist* playlist) {
     newSong->lyrics = readSongLyrics();
     newSong->streams = 0;
 
-    playlist->songs = realloc(playlist->songs, (playlist->songsNum + 1) * sizeof(Song*));
-    if (!playlist->songs) exit(1);
+    // Resize the playlist's songs array
+    Song** temp = realloc(playlist->songs, (playlist->songsNum + 1) * sizeof(Song*));
+    if (!temp) {
+        free(newSong->title);
+        free(newSong->artist);
+        free(newSong->lyrics);
+        free(newSong);
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    playlist->songs = temp;
 
     playlist->songs[playlist->songsNum] = newSong;
     playlist->songsNum++;
@@ -175,7 +199,7 @@ void showPlaylist(Playlist* playlist) {
     // Display all songs once
     for (int i = 0; i < playlist->songsNum; i++) {
         Song* song = playlist->songs[i];
-        printf("%d. Title: %s\n   Artist: %s\n   Released: %d\n   Streams: %d\n",
+        printf("%d. Title: %s\n   Artist: %s\n   Released: %d\n   Streams: %d\n\n",
                i + 1, song->title, song->artist, song->year, song->streams);
     }
 
@@ -211,7 +235,7 @@ void playSongs(Playlist* playlist) {
 
     for (int i = 0; i < playlist->songsNum; i++) {
         Song* song = playlist->songs[i];
-        printf("Now playing %s:\n♪ %s ♪\n", song->title, song->lyrics);
+        printf("Now playing %s:\n♪ %s ♪\n\n", song->title, song->lyrics);
         song->streams++;
     }
 }
@@ -275,7 +299,6 @@ void deleteSong(Playlist* playlist) {
                i + 1, song->title, song->artist, song->year, song->streams);
     }
 
-    // Prompt the user to choose a song to delete
     printf("choose a song to delete, or 0 to quit:\n");
 
     int choice;
@@ -283,17 +306,15 @@ void deleteSong(Playlist* playlist) {
     getchar(); // Clear newline
 
     if (choice == 0) {
-        // User chose to quit
-        return;
+        return; // User chose to quit
     }
 
     if (choice < 1 || choice > playlist->songsNum) {
-        // Invalid choice
         printf("Invalid option\n");
         return;
     }
 
-    // Delete the chosen song
+    // Free memory of the selected song
     Song* songToDelete = playlist->songs[choice - 1];
     free(songToDelete->title);
     free(songToDelete->artist);
@@ -305,15 +326,15 @@ void deleteSong(Playlist* playlist) {
         playlist->songs[i - 1] = playlist->songs[i];
     }
 
-    // Update the number of songs in the playlist
     playlist->songsNum--;
 
-    // Resize the songs array
-    playlist->songs = realloc(playlist->songs, playlist->songsNum * sizeof(Song*));
-    if (playlist->songsNum > 0 && !playlist->songs) {
-        printf("malloc failed\n");
+    // Resize the playlist's songs array
+    Song** temp = realloc(playlist->songs, playlist->songsNum * sizeof(Song*));
+    if (playlist->songsNum > 0 && !temp) {
+        printf("Memory allocation failed\n");
         exit(1);
     }
+    playlist->songs = temp;
 
     printf("Song deleted successfully.\n");
 }
@@ -335,7 +356,7 @@ void playlistMenu(Playlist* playlist) {
         printf("\t3. Delete Song\n");
         printf("\t4. Sort\n");
         printf("\t5. Play\n");
-        printf("\t6. Exit\n");
+        printf("\t6. exit\n");
 
         // Get user choice
         scanf("%d", &choice);
@@ -383,56 +404,48 @@ void viewPlaylists(Playlist** playlists, int playlistsNum) {
         scanf("%d", &choice);
         getchar(); // Clear newline
 
-        if (playlistsNum == 0) {
-            if (choice == 1) {
-                return; // Back to main menu
-            } else {
-                printf("Invalid option\n");
-            }
-        } else {
+        if (playlistsNum == 0 && choice == 1) {
+            return; // Back to main menu
+        }
+
+        if (playlistsNum > 0) {
             if (choice == playlistsNum + 1) {
                 return; // Back to main menu
             }
             if (choice >= 1 && choice <= playlistsNum) {
                 // Enter the selected playlist menu
                 playlistMenu(playlists[choice - 1]);
-            } else {
-                printf("Invalid option\n");
+                continue; // Return to the loop after exiting the playlist menu
             }
         }
+
+        printf("Invalid option\n");
     }
 }
-
 // Function to remove a playlist
 void removePlaylist(Playlist*** playlists, int* playlistsNum) {
     int choice;
 
     while (1) {
         printf("Choose a playlist:\n");
-        // Display the playlists or the empty list
+
         if (*playlistsNum == 0) {
-            // Only show "Back to main menu" if no playlists exist
             printf("\t1. Back to main menu\n");
         } else {
-            // Show playlists to remove
             for (int i = 0; i < *playlistsNum; i++) {
                 printf("\t%d. %s\n", i + 1, (*playlists)[i]->name);
             }
             printf("\t%d. Back to main menu\n", *playlistsNum + 1);
         }
 
-        // Get user input
         scanf("%d", &choice);
         getchar(); // Clear newline
 
-        if (*playlistsNum == 0) {
-            // Handle empty playlist case
-            if (choice == 1) {
-                return; // Back to main menu
-            } else {
-                printf("Invalid option\n");
-            }
-        } else {
+        if (*playlistsNum == 0 && choice == 1) {
+            return; // Back to main menu
+        }
+
+        if (*playlistsNum > 0) {
             if (choice == *playlistsNum + 1) {
                 return; // Back to main menu
             }
@@ -465,10 +478,10 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum) {
 
                 printf("Playlist deleted.\n");
                 return; // Exit back to the main menu after deletion
-            } else {
-                printf("Invalid option\n");
             }
         }
+
+        printf("Invalid option\n");
     }
 }
 
