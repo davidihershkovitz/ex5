@@ -223,7 +223,7 @@ void deleteSong(Playlist* playlist) {
 
 void playlistMenu(Playlist* playlist) {
     while (1) {
-        printf("Playlist %s:\n1. Show Playlist\n2. Add Song\n3. Delete Song\n4. Sort\n5. Play\n6. Exit\n", playlist->name);
+        printf("Playlist %s:\n1. Show Playlist\n2. Add Song\n3. Delete Song\n4. Sort\n5. Play\n6. exit\n", playlist->name);
         int choice;
         if (scanf("%d", &choice) != 1) {
             printf("Invalid input.\n");
@@ -274,7 +274,7 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum) {
     int choice;
 
     while (1) {
-        printf("Choose a playlist to remove:\n");
+        printf("Choose a playlist:\n");
 
         if (*playlistsNum == 0) {
             printf("\t1. Back to main menu\n");
@@ -287,7 +287,7 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum) {
 
         if (scanf("%d", &choice) != 1) {
             printf("Invalid input. Please enter a number.\n");
-            while (getchar() != '\n'); // Clear the input buffer
+            while (getchar() != '\n'); // Clear invalid input
             continue;
         }
         getchar(); // Clear newline from buffer
@@ -302,7 +302,6 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum) {
             }
 
             if (choice >= 1 && choice <= *playlistsNum) {
-                // Delete the selected playlist
                 Playlist* playlistToDelete = (*playlists)[choice - 1];
                 free(playlistToDelete->name);
                 for (int i = 0; i < playlistToDelete->songsNum; i++) {
@@ -314,14 +313,12 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum) {
                 free(playlistToDelete->songs);
                 free(playlistToDelete);
 
-                // Shift remaining playlists
                 for (int i = choice; i < *playlistsNum; i++) {
                     (*playlists)[i - 1] = (*playlists)[i];
                 }
 
                 (*playlistsNum)--;
 
-                // Resize the playlists array
                 Playlist** temp = realloc(*playlists, (*playlistsNum) * sizeof(Playlist*));
                 if (*playlistsNum > 0 && !temp) {
                     printf("Memory allocation failed\n");
@@ -330,30 +327,28 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum) {
                 *playlists = temp;
 
                 printf("Playlist deleted successfully.\n");
-                return; // Exit after deletion
-            } else {
-                printf("Invalid option. Please choose a valid playlist number.\n");
+                return;
             }
-        } else {
-            printf("Invalid option. Please try again.\n");
+
+            printf("Invalid option. Please choose a valid playlist number.\n");
         }
     }
 }
 
 int main() {
-    Playlist** playlists = NULL; // Array of playlist pointers
-    int playlistsNum = 0;        // Number of playlists
-    int choice;                  // User's menu choice
+    Playlist** playlists = NULL;
+    int playlistsNum = 0;
+    int choice;
 
     while (1) {
-        printf("Please Choose:\n\t1. Watch playlists\n\t2. Add playlist\n\t3. Remove playlist\n\t4. Exit\n");
+        printf("Please Choose:\n\t1. Watch playlists\n\t2. Add playlist\n\t3. Remove playlist\n\t4. exit\n");
 
         if (scanf("%d", &choice) != 1) {
-            printf("Invalid input. Please enter a number.\n");
-            while (getchar() != '\n'); // Clear input buffer
+            printf("Invalid input. Please enter a valid number.\n");
+            while (getchar() != '\n'); // Clear invalid input
             continue;
         }
-        getchar(); // Clear newline from the input buffer
+        getchar(); // Clear newline
 
         switch (choice) {
         case 1:
@@ -366,7 +361,7 @@ int main() {
             removePlaylist(&playlists, &playlistsNum);
             break;
         case 4:
-            // Free all allocated memory before exiting
+            // Free all memory before exiting
                 for (int i = 0; i < playlistsNum; i++) {
                     free(playlists[i]->name);
                     for (int j = 0; j < playlists[i]->songsNum; j++) {
@@ -382,7 +377,7 @@ int main() {
             printf("Goodbye!\n");
             return 0;
         default:
-            printf("Invalid option. Please choose between 1 and 4.\n");
+            printf("Invalid option\n");
         }
     }
 }
