@@ -143,7 +143,7 @@ void addPlaylist(Playlist*** playlists, int* playlistsNum) {
     (*playlists)[*playlistsNum] = newPlaylist;
     (*playlistsNum)++;
 }
-
+// func that add songs
 void addSong(Playlist* playlist) {
     Song* newSong = malloc(sizeof(Song));
     if (!newSong) exit(1);
