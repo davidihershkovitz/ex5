@@ -128,8 +128,7 @@ char* readSongLyrics() {
 
 // Function to add a playlist
 void addPlaylist(Playlist*** playlists, int* playlistsNum) {
-    char* playlistName = readPlaylistName();
-    printf("Enter playlist's name:\n");
+    char* playlistName = readPlaylistName(); // Prompt already happens here
 
     Playlist* newPlaylist = malloc(sizeof(Playlist));
     if (!newPlaylist) exit(1);
@@ -321,9 +320,16 @@ void deleteSong(Playlist* playlist) {
 
 void playlistMenu(Playlist* playlist) {
     int choice;
+    int firstTime = 1; // Flag to track first entry to the menu
 
     while (1) {
-        printf("playlist %s:\n", playlist->name);
+        if (firstTime) {
+            // Print playlist name only on first entry
+            printf("playlist %s:\n", playlist->name);
+            firstTime = 0; // Set flag to avoid repeating the name
+        }
+
+        // Print the menu options
         printf("\t1. Show Playlist\n");
         printf("\t2. Add Song\n");
         printf("\t3. Delete Song\n");
@@ -331,6 +337,7 @@ void playlistMenu(Playlist* playlist) {
         printf("\t5. Play\n");
         printf("\t6. Exit\n");
 
+        // Get user choice
         scanf("%d", &choice);
         getchar(); // Clear newline
 
@@ -351,8 +358,7 @@ void playlistMenu(Playlist* playlist) {
             playSongs(playlist);
             break;
         case 6:
-            // Exit the playlist menu and return to playlist selection menu
-                return;
+            return; // Exit to the main menu
         default:
             printf("Invalid option\n");
         }
@@ -360,83 +366,110 @@ void playlistMenu(Playlist* playlist) {
 }
 
 void viewPlaylists(Playlist** playlists, int playlistsNum) {
-    if (playlistsNum == 0) {
-        printf("Choose a playlist:\n\t1. Back to main menu\n");
-        return;
-    }
-
     int choice;
+
     while (1) {
         printf("Choose a playlist:\n");
-        for (int i = 0; i < playlistsNum; i++) {
-            printf("\t%d. %s\n", i + 1, playlists[i]->name);
+
+        if (playlistsNum == 0) {
+            printf("\t1. Back to main menu\n");
+        } else {
+            for (int i = 0; i < playlistsNum; i++) {
+                printf("\t%d. %s\n", i + 1, playlists[i]->name);
+            }
+            printf("\t%d. Back to main menu\n", playlistsNum + 1);
         }
-        printf("\t%d. Back to main menu\n", playlistsNum + 1);
 
         scanf("%d", &choice);
         getchar(); // Clear newline
 
-        if (choice == playlistsNum + 1) {
-            // Back to main menu
-            return;
-        }
-        if (choice >= 1 && choice <= playlistsNum) {
-            // Enter the selected playlist menu
-            playlistMenu(playlists[choice - 1]);
+        if (playlistsNum == 0) {
+            if (choice == 1) {
+                return; // Back to main menu
+            } else {
+                printf("Invalid option\n");
+            }
         } else {
-            printf("Invalid option\n");
+            if (choice == playlistsNum + 1) {
+                return; // Back to main menu
+            }
+            if (choice >= 1 && choice <= playlistsNum) {
+                // Enter the selected playlist menu
+                playlistMenu(playlists[choice - 1]);
+            } else {
+                printf("Invalid option\n");
+            }
         }
     }
 }
 
 // Function to remove a playlist
 void removePlaylist(Playlist*** playlists, int* playlistsNum) {
-    if (*playlistsNum == 0) {
-        printf("No playlists to remove.\n");
-        return;
-    }
-
-    printf("Choose a playlist to remove:\n");
-    for (int i = 0; i < *playlistsNum; i++) {
-        printf("\t%d. %s\n", i + 1, (*playlists)[i]->name);
-    }
-    printf("\t%d. Back to main menu\n", *playlistsNum + 1);
-
     int choice;
-    scanf("%d", &choice);
-    getchar(); // Clear newline
 
-    if (choice == *playlistsNum + 1) {
-        return; // Back to main menu
+    while (1) {
+        printf("Choose a playlist:\n");
+        // Display the playlists or the empty list
+        if (*playlistsNum == 0) {
+            // Only show "Back to main menu" if no playlists exist
+            printf("\t1. Back to main menu\n");
+        } else {
+            // Show playlists to remove
+            for (int i = 0; i < *playlistsNum; i++) {
+                printf("\t%d. %s\n", i + 1, (*playlists)[i]->name);
+            }
+            printf("\t%d. Back to main menu\n", *playlistsNum + 1);
+        }
+
+        // Get user input
+        scanf("%d", &choice);
+        getchar(); // Clear newline
+
+        if (*playlistsNum == 0) {
+            // Handle empty playlist case
+            if (choice == 1) {
+                return; // Back to main menu
+            } else {
+                printf("Invalid option\n");
+            }
+        } else {
+            if (choice == *playlistsNum + 1) {
+                return; // Back to main menu
+            }
+            if (choice >= 1 && choice <= *playlistsNum) {
+                // Delete the selected playlist
+                Playlist* playlistToDelete = (*playlists)[choice - 1];
+                free(playlistToDelete->name);
+                for (int i = 0; i < playlistToDelete->songsNum; i++) {
+                    free(playlistToDelete->songs[i]->title);
+                    free(playlistToDelete->songs[i]->artist);
+                    free(playlistToDelete->songs[i]->lyrics);
+                    free(playlistToDelete->songs[i]);
+                }
+                free(playlistToDelete->songs);
+                free(playlistToDelete);
+
+                // Shift remaining playlists
+                for (int i = choice; i < *playlistsNum; i++) {
+                    (*playlists)[i - 1] = (*playlists)[i];
+                }
+
+                (*playlistsNum)--;
+
+                // Resize the playlists array
+                *playlists = realloc(*playlists, (*playlistsNum) * sizeof(Playlist*));
+                if (*playlistsNum > 0 && !*playlists) {
+                    printf("malloc failed\n");
+                    exit(1);
+                }
+
+                printf("Playlist deleted.\n");
+                return; // Exit back to the main menu after deletion
+            } else {
+                printf("Invalid option\n");
+            }
+        }
     }
-    if (choice < 1 || choice > *playlistsNum) {
-        printf("Invalid option\n");
-        return;
-    }
-
-    Playlist* playlistToDelete = (*playlists)[choice - 1];
-
-    // Free playlist memory
-    free(playlistToDelete->name);
-    for (int i = 0; i < playlistToDelete->songsNum; i++) {
-        free(playlistToDelete->songs[i]->title);
-        free(playlistToDelete->songs[i]->artist);
-        free(playlistToDelete->songs[i]->lyrics);
-        free(playlistToDelete->songs[i]);
-    }
-    free(playlistToDelete->songs);
-    free(playlistToDelete);
-
-    // Shift playlists to fill the gap
-    for (int i = choice; i < *playlistsNum; i++) {
-        (*playlists)[i - 1] = (*playlists)[i];
-    }
-
-    (*playlistsNum)--;
-    *playlists = realloc(*playlists, (*playlistsNum) * sizeof(Playlist*));
-    if (*playlistsNum > 0 && !*playlists) exit(1);
-
-    printf("Playlist removed successfully.\n");
 }
 
 
