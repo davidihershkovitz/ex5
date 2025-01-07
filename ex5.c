@@ -164,14 +164,14 @@ void addSong(Playlist* playlist) {
     if (!newSong) exit(1);
 
     printf("Enter song's details\n");
-    newSong->title = readSongTitle();
-    newSong->artist = readSongArtist();
+    newSong->title = readSongTitle();  // Prompt and read title
+    newSong->artist = readSongArtist(); // Prompt and read artist
 
     printf("Year of release:\n");
     scanf("%d", &newSong->year);
-    getchar(); // Clear newline
+    while (getchar() != '\n'); // Clear the input buffer completely
 
-    newSong->lyrics = readSongLyrics();
+    newSong->lyrics = readSongLyrics(); // Prompt and read lyrics
     newSong->streams = 0;
 
     // Resize the playlist's songs array
@@ -235,7 +235,7 @@ void playSongs(Playlist* playlist) {
 
     for (int i = 0; i < playlist->songsNum; i++) {
         Song* song = playlist->songs[i];
-        printf("Now playing %s:\n♪ %s ♪\n\n", song->title, song->lyrics);
+        printf("Now playing %s:\n♪ %s ♪\n", song->title, song->lyrics);
         song->streams++;
     }
 }
