@@ -47,7 +47,7 @@ char* readPlaylistName() {
     size_t size = 0, capacity = 1;
     char c;
 
-    while ((c = getchar()) != '\n') {
+    while ((c = getchar()) != '\n' && c != '\r'); {
         if (size + 1 >= capacity) {
             capacity *= 2; // Double the capacity
             char* temp = realloc(name, capacity * sizeof(char));
@@ -73,7 +73,7 @@ char* readSongTitle() {
     size_t size = 0, capacity = 1;
     char c;
 
-    while ((c = getchar()) != '\n') {
+    while ((c = getchar()) != '\n' && c != '\r'); {
         if (size + 1 >= capacity) {
             capacity *= 2; // Double capacity dynamically
             char* temp = realloc(title, capacity * sizeof(char));
@@ -98,7 +98,7 @@ char* readSongArtist() {
     size_t size = 0, capacity = 1;
     char c;
 
-    while ((c = getchar()) != '\n') {
+    while ((c = getchar()) != '\n' && c != '\r') {
         if (size + 1 >= capacity) {
             capacity *= 2; // Double capacity dynamically
             char* temp = realloc(artist, capacity * sizeof(char));
@@ -124,7 +124,7 @@ char* readSongLyrics() {
     size_t size = 0, capacity = 1;
     char c;
 
-    while ((c = getchar()) != '\n') {
+    while ((c = getchar()) != '\n' && c != '\r') {
         if (size + 1 >= capacity) {
             capacity *= 2; // Double capacity dynamically
             char* temp = realloc(lyrics, capacity * sizeof(char));
