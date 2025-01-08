@@ -23,10 +23,7 @@ typedef struct Playlist {
     int songsNum;
 } Playlist;
 
-char* readPlaylistName();
-char* readSongTitle();
-char* readSongArtist();
-char* readSongLyrics();
+
 void addPlaylist(Playlist*** playlists, int* playlistsNum);
 void addSong(Playlist* playlist);
 void showPlaylist(Playlist* playlist);
@@ -38,112 +35,34 @@ void viewPlaylists(Playlist** playlists, int playlistsNum);
 void removePlaylist(Playlist*** playlists, int* playlistsNum);
 
 
-// Function to read a playlist name
-char* readPlaylistName() {
-    printf("Enter playlist's name:\n");
-    char* name = malloc(sizeof(char));
-    if (!name) exit(1);
-
-    size_t size = 0, capacity = 1;
-    char c;
-
-    while ((c = getchar()) != '\n' && c != '\r') {
-        if (size + 1 >= capacity) {
-            capacity *= 2; // Double the capacity
-            char* temp = realloc(name, capacity * sizeof(char));
-            if (!temp) {
-                free(name); // Avoid memory leak
-                printf("Memory allocation failed\n");
-                exit(1);
-            }
-            name = temp;
-        }
-        name[size++] = c;
+char* inputString() {
+    char* input = malloc(sizeof(char)); // Allocate initial memory
+    if (!input) {
+        printf("Memory allocation failed\n");
+        exit(1);
     }
-    name[size] = '\0'; // Null-terminate the string
-    return name;
-}
 
-// Function to read a song title
-char* readSongTitle() {
-    printf("Title:\n");
-    char* title = malloc(sizeof(char));
-    if (!title) exit(1); // Check initial allocation
+    char letter;
+    size_t count = 0;
 
-    size_t size = 0, capacity = 1;
-    char c;
-
-    while ((c = getchar()) != '\n' && c != '\r') {
-        if (size + 1 >= capacity) {
-            capacity *= 2; // Double capacity dynamically
-            char* temp = realloc(title, capacity * sizeof(char));
-            if (!temp) {
-                free(title); // Avoid memory leak
-                printf("Memory allocation failed\n");
-                exit(1);
-            }
-            title = temp;
+    // Loop to read input until newline or carriage return
+    while ((letter = getchar()) != '\n' && letter != '\r') {
+        char* temp = realloc(input, (count + 2) * sizeof(char)); // Resize memory
+        if (!temp) {
+            free(input); // Free allocated memory on failure
+            printf("Memory allocation failed\n");
+            exit(1);
         }
-        title[size++] = c;
+        input = temp;
+        input[count++] = letter; // Store the character
     }
-    title[size] = '\0'; // Null-terminate the string
-    return title;
-}
-// Function to read a song's artist
-char* readSongArtist() {
-    printf("Artist:\n");
-    char* artist = malloc(sizeof(char));
-    if (!artist) exit(1); // Check initial allocation
-
-    size_t size = 0, capacity = 1;
-    char c;
-
-    while ((c = getchar()) != '\n' && c != '\r') {
-        if (size + 1 >= capacity) {
-            capacity *= 2; // Double capacity dynamically
-            char* temp = realloc(artist, capacity * sizeof(char));
-            if (!temp) {
-                free(artist); // Avoid memory leak
-                printf("Memory allocation failed\n");
-                exit(1);
-            }
-            artist = temp; // Assign the new memory to artist
-        }
-        artist[size++] = c;
-    }
-    artist[size] = '\0'; // Null-terminate the string
-    return artist;
-}
-
-// Function to read song lyrics
-char* readSongLyrics() {
-    printf("Lyrics:\n");
-    char* lyrics = malloc(sizeof(char));
-    if (!lyrics) exit(1); // Check initial allocation
-
-    size_t size = 0, capacity = 1;
-    char c;
-
-    while ((c = getchar()) != '\n' && c != '\r') {
-        if (size + 1 >= capacity) {
-            capacity *= 2; // Double capacity dynamically
-            char* temp = realloc(lyrics, capacity * sizeof(char));
-            if (!temp) {
-                free(lyrics); // Free original memory to prevent leak
-                printf("Memory allocation failed\n");
-                exit(1);
-            }
-            lyrics = temp; // Assign the new memory to lyrics
-        }
-        lyrics[size++] = c;
-    }
-    lyrics[size] = '\0'; // Null-terminate the string
-    return lyrics;
+    input[count] = '\0'; // Null-terminate the string
+    return input;
 }
 
 // Function to add a playlist
 void addPlaylist(Playlist*** playlists, int* playlistsNum) {
-    char* playlistName = readPlaylistName(); // Prompt already happens here
+    char* playlistName = inputString(); // Prompt already happens here
 
     Playlist* newPlaylist = malloc(sizeof(Playlist));
     if (!newPlaylist) exit(1);
@@ -164,14 +83,14 @@ void addSong(Playlist* playlist) {
     if (!newSong) exit(1);
 
     printf("Enter song's details\n");
-    newSong->title = readSongTitle();  // Prompt and read title
-    newSong->artist = readSongArtist(); // Prompt and read artist
+    newSong->title = inputString();  // Prompt and read title
+    newSong->artist = inputString(); // Prompt and read artist
 
     printf("Year of release:\n");
     scanf("%d", &newSong->year);
     while (getchar() != '\n'); // Clear the input buffer completely
 
-    newSong->lyrics = readSongLyrics(); // Prompt and read lyrics
+    newSong->lyrics = inputString(); // Prompt and read lyrics
     newSong->streams = 0;
 
     // Resize the playlist's songs array
