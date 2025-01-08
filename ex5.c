@@ -36,35 +36,41 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum);
 
 
 char* readingInput() {
-    char* input = malloc(sizeof(char)); // Allocate initial memory
+    size_t size = 1;                // Initial size for dynamic allocation
+    char* input = malloc(size);     // Allocate memory dynamically
     if (!input) {
         printf("Memory allocation failed\n");
         exit(1);
     }
 
-    int countLetter = 0;
-    char letter;
+    size_t len = 0;                 // Current length of the input
+    char ch;
 
-    // Skip any leftover \n or \r characters from the input buffer
-    do {
-        letter = getchar();
-    } while (letter == '\n' || letter == '\r');
-
-    // Read input until newline or EOF
-    while (letter != '\n' && letter != '\r' && letter != EOF) {
-        input = realloc(input, (countLetter + 2) * sizeof(char)); // Resize memory
-        if (!input) {
-            printf("Memory allocation failed\n");
-            exit(1);
+    while ((ch = getchar()) != '\n' && ch != EOF) {
+        if (ch == '\r') {
+            continue;               // Skip carriage return characters
         }
-        input[countLetter++] = letter; // Store the character
-        letter = getchar(); // Read the next character
+        if (len + 1 >= size) {      // Resize buffer if full
+            size *= 2;              // Double the buffer size
+            char* newInput = realloc(input, size);
+            if (!newInput) {
+                free(input);
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            input = newInput;
+        }
+        input[len++] = ch;          // Append the character
     }
 
-    input[countLetter] = '\0'; // Null-terminate the string
-    return input;
-}
+    if (len == 0 && ch == EOF) {    // Handle EOF without any input
+        free(input);
+        return NULL;
+    }
 
+    input[len] = '\0';              // Null-terminate the string
+    return input;                   // Return the dynamically allocated input
+}
 // Function to add a playlist
 void addPlaylist(Playlist*** playlists, int* playlistsNum) {
     char* playlistName = readingInput(); // Prompt already happens here
