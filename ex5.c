@@ -45,23 +45,26 @@ char* readingInput() {
     int countLetter = 0;
     char letter;
 
-    while (1) {
-        letter = getchar(); // Read a character
-        if (letter == '\r') continue; // Ignore '\r'
-        if (letter == '\n' || letter == EOF) { // End of input
-            break;
-        }
+    // Skip any leftover \n or \r characters from the input buffer
+    do {
+        letter = getchar();
+    } while (letter == '\n' || letter == '\r');
+
+    // Read input until newline or EOF
+    while (letter != '\n' && letter != '\r' && letter != EOF) {
         input = realloc(input, (countLetter + 2) * sizeof(char)); // Resize memory
         if (!input) {
             printf("Memory allocation failed\n");
             exit(1);
         }
         input[countLetter++] = letter; // Store the character
+        letter = getchar(); // Read the next character
     }
 
     input[countLetter] = '\0'; // Null-terminate the string
     return input;
 }
+
 // Function to add a playlist
 void addPlaylist(Playlist*** playlists, int* playlistsNum) {
     char* playlistName = readingInput(); // Prompt already happens here
