@@ -23,7 +23,7 @@ typedef struct Playlist {
     int songsNum;
 } Playlist;
 
-char* inputString();
+char* readingInput();
 void addPlaylist(Playlist*** playlists, int* playlistsNum);
 void addSong(Playlist* playlist);
 void showPlaylist(Playlist* playlist);
@@ -35,7 +35,7 @@ void viewPlaylists(Playlist** playlists, int playlistsNum);
 void removePlaylist(Playlist*** playlists, int* playlistsNum);
 
 
-char* inputString() {
+char* readingInput() {
     char* input = malloc(sizeof(char)); // Allocate initial memory
     if (!input) {
         printf("Memory allocation failed\n");
@@ -48,7 +48,7 @@ char* inputString() {
 
     do {
         letter = getchar(); // Read a character
-        if (letter != '\n' && letter != '\r') {
+        if (letter != '\n') {
             input = realloc(input, (countLetter + 2) * sizeof(char)); // Resize memory
             if (!input) {
                 printf("Memory allocation failed\n");
@@ -66,7 +66,7 @@ char* inputString() {
 
 // Function to add a playlist
 void addPlaylist(Playlist*** playlists, int* playlistsNum) {
-    char* playlistName = inputString(); // Prompt already happens here
+    char* playlistName = readingInput(); // Prompt already happens here
 
     Playlist* newPlaylist = malloc(sizeof(Playlist));
     if (!newPlaylist) exit(1);
@@ -87,14 +87,14 @@ void addSong(Playlist* playlist) {
     if (!newSong) exit(1);
 
     printf("Enter song's details\n");
-    newSong->title = inputString();  // Prompt and read title
-    newSong->artist = inputString(); // Prompt and read artist
+    newSong->title = readingInput();  // Prompt and read title
+    newSong->artist = readingInput(); // Prompt and read artist
 
     printf("Year of release:\n");
     scanf("%d", &newSong->year);
     while (getchar() != '\n'); // Clear the input buffer completely
 
-    newSong->lyrics = inputString(); // Prompt and read lyrics
+    newSong->lyrics = readingInput(); // Prompt and read lyrics
     newSong->streams = 0;
 
     // Resize the playlist's songs array
