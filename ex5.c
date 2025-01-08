@@ -158,7 +158,7 @@ void playSongs(Playlist* playlist) {
 
     for (int i = 0; i < playlist->songsNum; i++) {
         Song* song = playlist->songs[i];
-        printf("Now playing %s:\n♪ %s ♪\n", song->title, song->lyrics);
+        printf("Now playing %s:\n$ %s $\n", song->title, song->lyrics);
         song->streams++;
     }
 }
