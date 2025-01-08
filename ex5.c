@@ -23,6 +23,7 @@ typedef struct Playlist {
     int songsNum;
 } Playlist;
 
+// All the funcs that I used
 char* readingInput();
 void addPlaylist(Playlist*** playlists, int* playlistsNum);
 void addSong(Playlist* playlist);
@@ -34,10 +35,10 @@ void playlistMenu(Playlist* playlist);
 void viewPlaylists(Playlist** playlists, int playlistsNum);
 void removePlaylist(Playlist*** playlists, int* playlistsNum);
 
-
+// Func that will read the input without assuming the string's length
 char* readingInput() {
     size_t size = 1;                // Initial size for dynamic allocation
-    char* input = malloc(size);     // Allocate memory dynamically
+    char* input = malloc(size);     // Allocate memory dynamically/**/
     if (!input) {
         printf("Memory allocation failed\n");
         exit(1);
@@ -46,7 +47,7 @@ char* readingInput() {
     size_t len = 0;                 // Current length of the input
     char ch;
 
-    while ((ch = getchar()) != '\n' && ch != EOF) {
+    while ((ch = getchar()) != '\n') {
         if (ch == '\r') {
             continue;               // Skip carriage return characters
         }
@@ -63,14 +64,10 @@ char* readingInput() {
         input[len++] = ch;          // Append the character
     }
 
-    if (len == 0 && ch == EOF) {    // Handle EOF without any input
-        free(input);
-        return NULL;
-    }
-
     input[len] = '\0';              // Null-terminate the string
     return input;                   // Return the dynamically allocated input
 }
+
 // Function to add a playlist
 void addPlaylist(Playlist*** playlists, int* playlistsNum) {
     printf("Enter playlist's name:\n"); // Print prompt here
@@ -89,7 +86,7 @@ void addPlaylist(Playlist*** playlists, int* playlistsNum) {
     (*playlists)[*playlistsNum] = newPlaylist;
     (*playlistsNum)++;
 }
-// func that add songs
+// Func that adds songs
 void addSong(Playlist* playlist) {
     Song* newSong = malloc(sizeof(Song));
     if (!newSong) exit(1);
@@ -126,7 +123,7 @@ void addSong(Playlist* playlist) {
     playlist->songs[playlist->songsNum] = newSong;
     playlist->songsNum++;
 }
-
+// Func that will preview the chosen playlist
 void showPlaylist(Playlist* playlist) {
     if (playlist->songsNum == 0) {
         printf("Playlist %s is empty.\n", playlist->name);
@@ -445,7 +442,7 @@ int main() {
             removePlaylist(&playlists, &playlistsNum);
             break;
         case 4:
-            // Free all memory before exiting
+            // Free all memory before exiting to prevent memory leaks
                 for (int i = 0; i < playlistsNum; i++) {
                     free(playlists[i]->name);
                     for (int j = 0; j < playlists[i]->songsNum; j++) {
