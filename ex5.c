@@ -23,7 +23,7 @@ typedef struct Playlist {
     int songsNum;
 } Playlist;
 
-
+char* inputString();
 void addPlaylist(Playlist*** playlists, int* playlistsNum);
 void addSong(Playlist* playlist);
 void showPlaylist(Playlist* playlist);
@@ -42,21 +42,25 @@ char* inputString() {
         exit(1);
     }
 
+    int countLetter = 0;
     char letter;
-    size_t count = 0;
+    int gotString = 0;
 
-    // Loop to read input until newline or carriage return
-    while ((letter = getchar()) != '\n' && letter != '\r') {
-        char* temp = realloc(input, (count + 2) * sizeof(char)); // Resize memory
-        if (!temp) {
-            free(input); // Free allocated memory on failure
-            printf("Memory allocation failed\n");
-            exit(1);
+    do {
+        letter = getchar(); // Read a character
+        if (letter != '\n' && letter != '\r') {
+            input = realloc(input, (countLetter + 2) * sizeof(char)); // Resize memory
+            if (!input) {
+                printf("Memory allocation failed\n");
+                exit(1);
+            }
+            input[countLetter++] = letter; // Store the character
+        } else {
+            gotString = 1; // Mark end of string
         }
-        input = temp;
-        input[count++] = letter; // Store the character
-    }
-    input[count] = '\0'; // Null-terminate the string
+    } while (!gotString);
+
+    input[countLetter] = '\0'; // Null-terminate the string
     return input;
 }
 
