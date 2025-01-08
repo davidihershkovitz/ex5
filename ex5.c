@@ -36,31 +36,24 @@ void removePlaylist(Playlist*** playlists, int* playlistsNum);
 
 
 char* readingInput() {
-    char* input = malloc(sizeof(char)); // Allocate initial memory
-    if (!input) {
-        printf("Memory allocation failed\n");
-        exit(1);
+    char* input = malloc(sizeof(char));
+    if (!input) exit(1); // Exit if memory allocation fails
+
+    int count = 0; // Keeps track of the number of characters
+    char c; // Character to be read
+
+    while ((c = getchar()) != '\n' && c != '\r' && c != EOF) { // Stop on newline (\n), carriage return (\r), or EOF
+        input = realloc(input, (count + 2) * sizeof(char)); // Allocate memory for the next character
+        if (!input) exit(1); // Exit if memory allocation fails
+        input[count++] = c; // Add the character to the string
     }
 
-    int countLetter = 0;
-    char letter;
-    int gotString = 0;
+    // Consume the second part of "\r\n" if present (e.g., Windows-style line endings)
+    if (c == '\r' && (c = getchar()) != '\n' && c != EOF) {
+        ungetc(c, stdin); // Push back the extra character to the input buffer
+    }
 
-    do {
-        letter = getchar(); // Read a character
-        if (letter != '\n') {
-            input = realloc(input, (countLetter + 2) * sizeof(char)); // Resize memory
-            if (!input) {
-                printf("Memory allocation failed\n");
-                exit(1);
-            }
-            input[countLetter++] = letter; // Store the character
-        } else {
-            gotString = 1; // Mark end of string
-        }
-    } while (!gotString);
-
-    input[countLetter] = '\0'; // Null-terminate the string
+    input[count] = '\0'; // Null-terminate the string
     return input;
 }
 
