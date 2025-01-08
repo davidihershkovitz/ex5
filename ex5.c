@@ -73,7 +73,8 @@ char* readingInput() {
 }
 // Function to add a playlist
 void addPlaylist(Playlist*** playlists, int* playlistsNum) {
-    char* playlistName = readingInput(); // Prompt already happens here
+    printf("Enter playlist's name:\n"); // Print prompt here
+    char* playlistName = readingInput(); // Read input properly
 
     Playlist* newPlaylist = malloc(sizeof(Playlist));
     if (!newPlaylist) exit(1);
@@ -94,14 +95,20 @@ void addSong(Playlist* playlist) {
     if (!newSong) exit(1);
 
     printf("Enter song's details\n");
+
+    printf("Title:\n");
     newSong->title = readingInput();  // Prompt and read title
+
+    printf("Artist:\n");
     newSong->artist = readingInput(); // Prompt and read artist
 
     printf("Year of release:\n");
     scanf("%d", &newSong->year);
-    while (getchar() != '\n'); // Clear the input buffer completely
+    while (getchar() != '\n'); // Clear the input buffer
 
+    printf("Lyrics:\n");
     newSong->lyrics = readingInput(); // Prompt and read lyrics
+
     newSong->streams = 0;
 
     // Resize the playlist's songs array
