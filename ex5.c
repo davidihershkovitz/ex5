@@ -140,7 +140,7 @@ void showPlaylist(Playlist* playlist) {
         if (choice >= 1 && choice <= playlist->songsNum) {
             // Play the selected song
             Song* song = playlist->songs[choice - 1];
-            printf("Now playing %s:\n♪ %s ♪\n", song->title, song->lyrics);
+            printf("Now playing %s:\n$ %s $\n", song->title, song->lyrics);
             song->streams++; // Increment the streams counter
         } else {
             // Handle invalid input
