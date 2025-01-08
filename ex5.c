@@ -45,21 +45,18 @@ char* readingInput() {
     int countLetter = 0;
     char letter;
 
-    while ((letter = getchar()) != '\n' && letter != '\r' && letter != EOF) {
+    while (1) {
+        letter = getchar(); // Read a character
+        if (letter == '\r') continue; // Ignore '\r'
+        if (letter == '\n' || letter == EOF) { // End of input
+            break;
+        }
         input = realloc(input, (countLetter + 2) * sizeof(char)); // Resize memory
         if (!input) {
             printf("Memory allocation failed\n");
             exit(1);
         }
         input[countLetter++] = letter; // Store the character
-    }
-
-    // If '\r' is found, check for '\n' (handle Windows-style input)
-    if (letter == '\r') {
-        char nextChar = getchar();
-        if (nextChar != '\n' && nextChar != EOF) {
-            ungetc(nextChar, stdin); // Push back the extra character if it's not '\n'
-        }
     }
 
     input[countLetter] = '\0'; // Null-terminate the string
