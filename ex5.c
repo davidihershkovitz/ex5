@@ -222,7 +222,15 @@ void sortPlaylist(Playlist* playlist) {
 
 void deleteSong(Playlist* playlist) {
     if (playlist->songsNum == 0) {
-        printf("Playlist %s is empty.\n", playlist->name);
+        printf("choose a song to delete, or 0 to quit:\n");
+
+        int choice;
+        scanf("%d", &choice);
+        getchar(); // Clear newline
+
+        if (choice != 0) {
+            printf("Invalid option\n");
+        }
         return;
     }
 
@@ -240,7 +248,7 @@ void deleteSong(Playlist* playlist) {
     getchar(); // Clear newline
 
     if (choice == 0) {
-        return; // User chose to quit
+        return;
     }
 
     if (choice < 1 || choice > playlist->songsNum) {
