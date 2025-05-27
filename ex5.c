@@ -126,8 +126,19 @@ void addSong(Playlist* playlist) {
 // Func that will preview the chosen playlist
 void showPlaylist(Playlist* playlist) {
     if (playlist->songsNum == 0) {
-        printf("Playlist %s is empty.\n", playlist->name);
-        return;
+        while (1) {
+            printf("choose a song to play, or 0 to quit:\n");
+
+            int choice;
+            scanf("%d", &choice);
+            getchar(); // Clear newline
+
+            if (choice == 0) {
+                return;
+            } else {
+                printf("Invalid option\n");
+            }
+        }
     }
 
     // Display all songs once
@@ -149,17 +160,14 @@ void showPlaylist(Playlist* playlist) {
             return; // Exit to playlist menu
         }
         if (choice >= 1 && choice <= playlist->songsNum) {
-            // Play the selected song
             Song* song = playlist->songs[choice - 1];
             printf("Now playing %s:\n$ %s $\n", song->title, song->lyrics);
-            song->streams++; // Increment the streams counter
+            song->streams++;
         } else {
-            // Handle invalid input
             printf("Invalid option\n");
         }
     }
 }
-
 // Function to play songs
 void playSongs(Playlist* playlist) {
     if (playlist->songsNum == 0) {
