@@ -196,23 +196,23 @@ void sortPlaylist(Playlist* playlist) {
     }
 
     for (int i = 0; i < playlist->songsNum - 1; i++) {
-        for (int j = i + 1; j < playlist->songsNum; j++) {
+        for (int j = 0; j < playlist->songsNum - 1 - i; j++) {
             int swap = 0;
 
-            if (choice == 1 && playlist->songs[i]->year > playlist->songs[j]->year) {
+            if (choice == 1 && playlist->songs[j]->year > playlist->songs[j + 1]->year) {
                 swap = 1;
-            } else if (choice == 2 && playlist->songs[i]->streams > playlist->songs[j]->streams) {
+            } else if (choice == 2 && playlist->songs[j]->streams > playlist->songs[j + 1]->streams) {
                 swap = 1;
-            } else if (choice == 3 && playlist->songs[i]->streams < playlist->songs[j]->streams) {
+            } else if (choice == 3 && playlist->songs[j]->streams < playlist->songs[j + 1]->streams) {
                 swap = 1;
-            } else if (choice == 4 && strcmp(playlist->songs[i]->title, playlist->songs[j]->title) > 0) {
+            } else if (choice == 4 && strcmp(playlist->songs[j]->title, playlist->songs[j + 1]->title) > 0) {
                 swap = 1;
             }
 
             if (swap) {
-                Song* temp = playlist->songs[i];
-                playlist->songs[i] = playlist->songs[j];
-                playlist->songs[j] = temp;
+                Song* temp = playlist->songs[j];
+                playlist->songs[j] = playlist->songs[j + 1];
+                playlist->songs[j + 1] = temp;
             }
         }
     }
